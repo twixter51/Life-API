@@ -1,9 +1,6 @@
-# Life's API
+# Life's API V.01
 
 # This API leverages posts from any reddit community, preferably a inspirational community that posts quotes, images with quotes etc. 
-
-
-# Current Version 0.1
 
 
 - Implemented Tesseract OCR so now images and their quotes are now transferred into a semi-readable string.
@@ -12,6 +9,11 @@
 
 - Expect constant updates as I am constantly going to improve this API as much as possible, I don't want praise for making this I just 
 
+
+
+# Contributions
+
+- All are welcome, if you want to implement any of the above features I plan on adding please do!
 
 
 
