@@ -65,6 +65,32 @@ async def image_to_bytes(img_url: str):
     return img
 
 
+async def clean_qoute(quote: str):
+    string = ""
+
+    prompt = f"""Rewrite this quote, remove any new break lines, and make it clean and fill in blanks
+    Max ~{300} characters. Return ONLY the final text (no preface/quotes).
+
+    Quote:
+    {quote}
+    """
+
+    payload = {
+        "model": "phi3:3.8b",  
+        "prompt": prompt,
+        "temperature": 0.2,
+        "stream": False
+    }
+
+
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.post("http://localhost:11434/api/generate", json=payload)
+        r.raise_for_status()
+        string = (r.json().get("response") or "").strip()      
+    return string
+
+
+
 async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "top"]):
     url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={50}"
     headers = {"User-Agent": "fastapi-learning-app/0.1"}
@@ -114,6 +140,7 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 
         if not after:
             break
+
         url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={50}&after={after}"
         await asyncio.sleep(3) 
 
@@ -128,7 +155,9 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 
 
     for entry in NEW_POSTS:
-        entry["image_quote"] = pytesseract.image_to_string(await image_to_bytes(entry["image"]))
+        quote =  pytesseract.image_to_string(await image_to_bytes(entry["image"]))
+        quote = await clean_qoute(quote)
+        entry["image_quote"] = quote
             
  
 

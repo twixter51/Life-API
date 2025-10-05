@@ -1,13 +1,24 @@
-# Life's API V.01
+# Life's API V.02
 
 # This API leverages posts from any reddit community, preferably a inspirational community that posts quotes, images with quotes etc. 
 
 
-- Implemented Tesseract OCR so now images and their quotes are now transferred into a semi-readable string.
+# Updates
+
+- (0.1) Implemented Tesseract OCR so now images and their quotes are now transferred into a semi-readable string.
+
+- (0.2) Life API now Integrates Ollama phi3:3.8b to rewrite and clean up the quote that has been extracted from the image.
+
+
+
+
+
+
+
 
 - Future will include AI integration where I clean up the quotes and package them nicely with the image.
 
-- Expect constant updates as I am constantly going to improve this API as much as possible, I don't want praise for making this I just 
+- Expect constant updates as I am constantly going to improve this API as much as possible
 
 
 
