@@ -1,4 +1,4 @@
-# Life's API V.02
+# Life's API V.03
 
 # This API leverages posts from any reddit community, preferably a inspirational community that posts quotes, images with quotes etc. 
 
@@ -9,17 +9,10 @@
 
 - (0.2) Life API now Integrates Ollama phi3:3.8b to rewrite and clean up the quote that has been extracted from the image.
 
+- (0.3) Implemented Cache for faster response times on frequent fetches
 
-
-
-
-
-
-
-- Future will include AI integration where I clean up the quotes and package them nicely with the image.
 
 - Expect constant updates as I am constantly going to improve this API as much as possible
-
 
 
 # Contributions

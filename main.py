@@ -12,6 +12,13 @@ import random
 
 import pytesseract
 
+#cache 
+import time
+CACHE = {}
+CACHE_TTL = 300
+CACHE_TIME = {}
+###
+
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 #auth
@@ -59,9 +66,9 @@ class SubredditResponse(BaseModel):
 async def image_to_bytes(img_url: str):
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(img_url)      # <-- downloads raw bytes
+        response = await client.get(img_url)     
         response.raise_for_status()
-    img = Image.open(BytesIO(response.content))  # <-- convert bytes to Pillow image
+    img = Image.open(BytesIO(response.content))  
     return img
 
 
@@ -150,15 +157,7 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
    
        
         
-    random.shuffle(NEW_POSTS)
-    NEW_POSTS = NEW_POSTS[:limit]
-
-
-    for entry in NEW_POSTS:
-        quote =  pytesseract.image_to_string(await image_to_bytes(entry["image"]))
-        quote = await clean_qoute(quote)
-        entry["image_quote"] = quote
-            
+   
  
 
 
@@ -175,9 +174,25 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 async def get_inspiration_from_reddit(subreddit: str, limit: int = Query(5, ge=1, le=25), sort: Literal["hot", "new", "top"] = "hot", _auth: bool = Depends(require_api_key)):
     subreddit = subreddit.lower()
 
-
-    posts = await fetch_posts(subreddit, limit, sort)
     
+
+    if subreddit in CACHE and time.time() - CACHE_TIME[subreddit] < CACHE_TTL:
+           posts = CACHE[subreddit]
+    else:
+        posts = await fetch_posts(subreddit, limit, sort)
+        CACHE[subreddit] = posts
+        CACHE_TIME[subreddit] = time.time()
+    
+
+    random.shuffle(posts)
+    posts = posts[:limit]
+
+
+    #for entry in NEW_POSTS:
+        # quote =  pytesseract.image_to_string(await image_to_bytes(entry["image"]))
+        # quote = await clean_qoute(quote)
+        #entry["image_quote"] = quote
+            
     return {
         "subreddit": subreddit,
         "limit": limit,
