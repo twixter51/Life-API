@@ -1,6 +1,6 @@
-# Life's API V.03
+# Inspo API V.03
 
-# This API leverages posts from any reddit community, preferably a inspirational community that posts quotes, images with quotes etc. 
+# This API leverages posts from any reddit community, preferably a inspirational community that posts quotes, images with quotes etc. Or any social media!
 
 
 # Updates
