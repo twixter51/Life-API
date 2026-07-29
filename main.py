@@ -9,7 +9,6 @@ from io import BytesIO
 import asyncio
 import httpx
 import random
-
 import pytesseract
 
 #cache 
@@ -32,7 +31,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-
 async def require_api_key(x_api_key: str | None = Header(default=None)):
     if x_api_key != settings.API_KEY:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key")
@@ -44,7 +42,6 @@ async def require_api_key(x_api_key: str | None = Header(default=None)):
 # (temporary documnentation) This API allows you to grab any inspiritional quote directly from r/inspiration on reddit. Although most are images (AI will be implemented later to counteract this)
 
 app = FastAPI()
-
 
 class PostPreview(BaseModel):
     id: str
@@ -97,7 +94,6 @@ async def clean_qoute(quote: str):
     return string
 
 
-
 async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "top"]):
     url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={50}"
     headers = {"User-Agent": "fastapi-learning-app/0.1"}
@@ -107,9 +103,8 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 
 
 
-    # add error handling later
+    # add error handling here soon
         
-
     # Include more types, for example if it's a gif then....its skipped
     
     while len(NEW_POSTS) < 90:
@@ -144,26 +139,16 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
                 }).model_dump())
                    
         
-
         if not after:
             break
 
         url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={50}&after={after}"
         await asyncio.sleep(3) 
 
-    
-
-
-   
-       
-        
-   
- 
 
 
     return NEW_POSTS
     
-
 
 
 @app.get("/reddit/{subreddit}", 
@@ -174,8 +159,6 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 async def get_inspiration_from_reddit(subreddit: str, limit: int = Query(5, ge=1, le=25), sort: Literal["hot", "new", "top"] = "hot", _auth: bool = Depends(require_api_key)):
     subreddit = subreddit.lower()
 
-    
-
     if subreddit in CACHE and time.time() - CACHE_TIME[subreddit] < CACHE_TTL:
            posts = CACHE[subreddit]
     else:
@@ -183,15 +166,13 @@ async def get_inspiration_from_reddit(subreddit: str, limit: int = Query(5, ge=1
         CACHE[subreddit] = posts
         CACHE_TIME[subreddit] = time.time()
     
-
     random.shuffle(posts)
     posts = posts[:limit]
 
-
-    #for entry in NEW_POSTS:
-        # quote =  pytesseract.image_to_string(await image_to_bytes(entry["image"]))
-        # quote = await clean_qoute(quote)
-        #entry["image_quote"] = quote
+    for entry in posts:
+        quote = pytesseract.image_to_string(await image_to_bytes(entry["image"]))
+        quote = await clean_qoute(quote)
+        entry["image_quote"] = quote
             
     return {
         "subreddit": subreddit,
