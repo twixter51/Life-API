@@ -159,12 +159,13 @@ async def fetch_posts(subreddit: str, limit: int, sort:Literal["hot", "new", "to
 async def get_inspiration_from_reddit(subreddit: str, limit: int = Query(5, ge=1, le=25), sort: Literal["hot", "new", "top"] = "hot", _auth: bool = Depends(require_api_key)):
     subreddit = subreddit.lower()
 
-    if subreddit in CACHE and time.time() - CACHE_TIME[subreddit] < CACHE_TTL:
-           posts = CACHE[subreddit]
-    else:
+    if subreddit in CACHE and time.time() - CACHE_TIME[subreddit] > CACHE_TLL: # more than 5 minutes have passed
         posts = await fetch_posts(subreddit, limit, sort)
         CACHE[subreddit] = posts
         CACHE_TIME[subreddit] = time.time()
+    else: # more than 5 minutes have not passed our cache is not stale
+           posts = CACHE[subreddit]
+
     
     random.shuffle(posts)
     posts = posts[:limit]
